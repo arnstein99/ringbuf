@@ -53,9 +53,10 @@ private:
 
     size_t _size;
     size_t _capacity;
-    size_t _push_next;
-    size_t _pop_next;
-    _T* _ring;
+    _T* _push_next;
+    _T* _pop_next;
+    _T* _ring_start;
+    _T* _ring_end;
 };
 
 // Helper functions
