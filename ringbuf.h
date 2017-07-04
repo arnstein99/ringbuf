@@ -29,7 +29,7 @@ class Ringbuf
 public:
 
     Ringbuf (size_t capacity);
-    ~Ringbuf ();
+    virtual ~Ringbuf ();
     int ipushback (const _T&); // 0 for success, 1 for failure.
     int ipop (_T&);            // 0 for success, 1 for failure.
 
