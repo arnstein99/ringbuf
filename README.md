@@ -12,6 +12,21 @@ There is an example derived class in file `posix_ringbuf.h`.
 There is a simple test and demonstration program in file `testring.cc`.
 
 There is a `Makefile` for the demonstration program, I tested it on a Debian Linux host.
+## Public Members
+### Constructor
+`Ringbuf (size_t capacity)` This is the only provided constructor. The argument is the number of elements in thering.
+### Destructor
+`virtual ~Ringbuf ()` Virtual, due to existence of virtual protected member functions `increment_size()` and `decrement_size()`. These are described in the subsequent section **Thread Safety**.
+### Insert Function, With Return Value
+`int ipushback (const _T&)` returns 0 for success, 1 if ring is full. Copy semantics. Entry in ring is overwritten if necessary.
+### Insert Operator, With Exception
+`template<typename _T>
+Ringbuf<_T>& operator<< (Ringbuf<_T>&, const _T&) throw (RingbufFullException)`. Copy semantics. Entry in ring is overwritten if necessary.
+### Removal Function, With Return Value
+`int ipop (_T&)` Returns 0 for success, 1 if ring is empty. Copy semantics. Entry in ring is not destroyed.
+### Removal Operator, With Exception
+`template<typename _T>
+Ringbuf<_T>& operator>> (Ringbuf<_T>&, _T&) throw (RingbufEmptyException)` Copy semantics. Entry in ring is not destroyed.
 ## Thread Safety
 A mutex or similar mechanism is almost certain to be needed. This can be accomplished by deriving a new class from `Ringbuf` with overrides for two virtual functions `increment_size()` and `decrement_size()`. The first function is guaranteed to be called only when inserting into the ring buffer, the second function is guaranteed to be called only when removing from the ring buffer.
 
