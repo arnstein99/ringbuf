@@ -2,14 +2,17 @@
 #include <iostream>
 #include <errno.h>
 #include <unistd.h>
+#include <string>
 #include <pthread.h>
+#include <stdio.h>
 #include "posix_ringbuf.h"
 
 // Tuning
 static const int read_usleep = 1;
 static const int write_usleep = 1;
-static const int verbose = 2;
-// #define USE_POSIX
+static const int verbose = 1;
+#define USE_POSIX
+#define DEFAULT_RUN_SECONDS 30
 
 class Dummy
 {
@@ -27,35 +30,66 @@ static Ringbuf<Dummy> rbuf (11);
 
 static void* Reader (void* arg);
 static void* Writer (void* arg);
+static void Usage_exit (int exit_val);
 
-int main ()
+int main (int argc, char* argv[])
 {
+    int run_seconds;
+    switch (argc)
+    {
+    case 1:
+        run_seconds = DEFAULT_RUN_SECONDS;
+        break;
+    case 2:
+	if (sscanf (argv[1], "%d", &run_seconds) != 1)
+	{
+	    std::cerr << "Illegal numeric expression \"" << argv[1] <<
+	                 "\"" << std::endl;
+	    exit (1);
+	}
+	if (run_seconds < 0)
+	{
+	    std::cerr << "Please enter a non-negative number or nothing" <<
+	                 std::endl;
+            Usage_exit (1);
+	}
+        break;
+    default:
+        Usage_exit (0);
+        break;
+    }
+    
     pthread_t hReader, hWriter;
-
     if (pthread_create (&hReader, NULL, Reader, NULL) != 0)
     {
-        std::cerr << "pthread_create failed (1)" << std::endl;
-	return 1;
+        std::cerr << "pthread_create failed (1) " << strerror(errno) <<
+	             std::endl;
+	exit (1);
     }
     if (pthread_create (&hWriter, NULL, Writer, NULL) != 0)
     {
-        std::cerr << "pthread_create failed (2)" << std::endl;
-	return 1;
+        std::cerr << "pthread_create failed (2) " << strerror(errno) <<
+	             std::endl;
+	exit (1);
     }
     
-    sleep (30);
+    sleep (run_seconds);
+
     if (pthread_cancel (hWriter) != 0)
     {
-        std::cerr << "pthread_cancel failed (1)" << std::endl;
-	return 1;
+        std::cerr << "pthread_cancel failed (1) " << strerror(errno) <<
+	             std::endl;
+	exit (1);
     }
     if (pthread_cancel (hReader) != 0)
     {
-        std::cerr << "pthread_cancel failed (2)" << std::endl;
-	return 1;
+        std::cerr << "pthread_cancel failed (2) " << strerror(errno) <<
+	             std::endl;
+	exit (1);
     }
 
-    return 0;
+    std::cout << "No compare errors found" << std::endl;
+    exit (0);
 }
 
 static void* Writer (void* arg)
@@ -123,4 +157,10 @@ static void* Reader (void* arg)
     }
 
     return NULL;
+}
+
+static void Usage_exit (int exit_val)
+{
+    std::cerr << "Usage: test_ring [run_seconds]" << std::endl;
+    exit (exit_val);
 }
