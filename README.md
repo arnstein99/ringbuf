@@ -14,7 +14,7 @@ There is a simple test and demonstration program in file `testring.cc`.
 There is a `Makefile` for the demonstration program, I tested it on a Debian Linux host.
 ## Public Members
 ### Constructor
-`Ringbuf (size_t capacity)` This is the only provided constructor. The argument is the number of elements in thering.
+`Ringbuf (size_t capacity)` This is the only provided constructor. The argument is the number of elements in the ring.
 ### Destructor
 `virtual ~Ringbuf ()` Virtual, due to existence of virtual protected member functions `increment_size()` and `decrement_size()`. These are described in the subsequent section **Thread Safety**.
 ### Insert Function, With Return Value
