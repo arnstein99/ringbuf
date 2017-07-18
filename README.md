@@ -28,6 +28,8 @@ Ringbuf<_T>& operator<< (Ringbuf<_T>&, const _T&) throw (RingbufFullException)`.
 `template<typename _T>
 Ringbuf<_T>& operator>> (Ringbuf<_T>&, _T&) throw (RingbufEmptyException)` Copy semantics. Entry in ring is not destroyed.
 ## Thread Safety
+This design can be rendered safe to use in an environment where there is a single thread devoted to buffer insertion and a single thread devoted to buffer removal. **The design of this class is not suitable for use if there are multiple threads that insert or multiple threads that remove. Data corruption is almost certain to occur in these situations.**
+
 A mutex or similar mechanism is almost certain to be needed. This can be accomplished by deriving a new class from `Ringbuf` with overrides for two virtual functions `increment_size()` and `decrement_size()`. The first function is guaranteed to be called only when inserting into the ring buffer, the second function is guaranteed to be called only when removing from the ring buffer.
 
 An example of this derivation is included in file `posix_ringbuf.h`. This file is useful in its own right: it implements the mutex using the Posix pthread library. The derived template class is named `Posix_Ringbuf`.
