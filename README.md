@@ -36,6 +36,6 @@ An example of this derivation is included in file `posix_ringbuf.h`. This file i
 ## The Test Program
 The file `testring.cc` contains a test program. An associated `Makefile` is also provided.
 
-`testring.cc` has a few tuining parameters near its beginning. In particular, a `#define` determines whether the basic `Ringbuf` class or the thread-safe `Posix_Ringbuf` class is to be tested.
+`testring.cc` has a few tuning parameters near its beginning. In particular, a `#define` determines whether the basic `Ringbuf` class or the thread-safe `Posix_Ringbuf` class is to be tested.
 
 I verified the test program and its associated Makefile on a Debian Linux host. I found that the mutex feature was absolutely required to avoid incorrect behavior.
